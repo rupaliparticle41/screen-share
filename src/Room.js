@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Video from 'twilio-video';
 import Participant from './Participant';
 
@@ -6,9 +6,7 @@ const Room = ({ roomName, token, handleLogout }) => {
   const [room, setRoom] = useState(null);
   const [participants, setParticipants] = useState([]);
   const [isSharing, setIsSharing] = useState(false)
-  const [screenTrack,setscreenTrack]=useState(null)
-  const stopScreenShareRef = useRef();
- // let screenTrack=null
+  const [screenTrack,setScreenTrack]=useState(null)
 
   useEffect(() => {
     const participantConnected = participant => {
@@ -61,12 +59,11 @@ const Room = ({ roomName, token, handleLogout }) => {
       })
       .then(stream => {
        let track =stream.getTracks()[0]
-          setscreenTrack(track)
-        console.log("screenTrack",screenTrack)
+          setScreenTrack(track)
         room.localParticipant
           .publishTrack(track, {
-            name: 'screen', // Tracks can be named to easily find them later
-            priority: 'low', // Priority is set to high by the subscriber when the video track is rendered
+            name: 'screen', 
+            priority: 'low',
           })
           .then(trackPublication => {
              setIsSharing(true)
@@ -76,20 +73,16 @@ const Room = ({ roomName, token, handleLogout }) => {
           });
       })
       .catch(error => {
-        // Don't display an error if the user closes the screen share dialog
         if (error.name !== 'AbortError' && error.name !== 'NotAllowedError') {
            console.log("onError",error)
-          // onError(error);
         }
       });
   }
 
   const handlestopSharing = () => {
-    debugger
-    console.log("screenTrack", screenTrack)
       room.localParticipant.unpublishTrack(screenTrack);
         screenTrack.stop();
-        setscreenTrack(null)
+        setScreenTrack(null)
         setIsSharing(false);
       }
   
